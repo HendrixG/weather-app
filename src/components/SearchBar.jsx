@@ -1,10 +1,15 @@
 import React, { useState } from 'react';
 
-export default function SearchBar({ onSearch }) {
+export default function SearchBar({
+  onSearch,
+  placeholder = '',
+  disabled = false
+}) {
   const [query, setQuery] = useState('');
+
   const handleSubmit = e => {
     e.preventDefault();
-    if (!query.trim()) return;
+    if (!query.trim() || disabled) return;
     onSearch(query.trim());
     setQuery('');
   };
@@ -13,11 +18,15 @@ export default function SearchBar({ onSearch }) {
     <form onSubmit={handleSubmit} className="search-bar">
       <input
         type="text"
-        placeholder="Enter state, city, town name…"
         value={query}
         onChange={e => setQuery(e.target.value)}
+        placeholder={placeholder}
+        disabled={disabled}
       />
-      <button type="submit">Search</button>
+      <button type="submit" disabled={disabled}>
+        Search
+      </button>
     </form>
   );
 }
+
