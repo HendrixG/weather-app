@@ -90,9 +90,9 @@ function App() {
         <SearchBar
           onSearch={fetchWeather}
           placeholder={
-            weatherDataList.length < 5 ? 'Enter city name…' : 'Max 5 reached'
+            weatherDataList.length < 10 ? 'Enter city name…' : 'Max 10 reached'
           }
-          disabled={weatherDataList.length >= 5}
+          disabled={weatherDataList.length >= 10}
         />
 
         {loading && <p>Loading…</p>}
