@@ -16,7 +16,10 @@ export default function WeatherCard({ data, onRemove }) {
       </button>
       <h2>{name}, {country}</h2>
       <p><strong>Temp:</strong> {Math.round(temperature)}°C / {Math.round(fahrenheit)}°F</p>
-      <p><strong>Humidity:</strong> {humidity}%</p>
+       <p>
+        <strong>Humidity:</strong>{' '}
+        {humidity != null ? `${humidity}%` : 'N/A'}
+      </p>
       <p><strong>Wind:</strong> {windspeed} m/s</p>
     </div>
   );

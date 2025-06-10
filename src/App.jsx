@@ -45,7 +45,10 @@ function App() {
       const { current_weather, hourly } = await res.json();
       const { temperature, windspeed, time } = current_weather;
       const idx = hourly.time.findIndex(t => t === time);
-      const humidity = hourly.relativehumidity_2m[idx];
+      const humidity =
+        idx >= 0
+          ? hourly.relativehumidity_2m[idx]
+          : null;
 
       setWeatherDataList(prev => {
         const next = [
