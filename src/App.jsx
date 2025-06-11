@@ -100,7 +100,7 @@ function App() {
       </div>
 
       <div className="cards-container">
-        {weatherDataList.map(card => (
+        {[...weatherDataList].reverse().map(card => (
           <WeatherCard
             key={card.id}
             data={card}

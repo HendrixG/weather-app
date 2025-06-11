@@ -139,10 +139,14 @@ body.dark .weather-card {
   display: flex;
   justify-content: space-between;
   margin-top: 1rem;
+  gap: 1rem;
+  padding: 0 0.5rem;
 }
 .forecast-day {
   text-align: center;
   font-size: 0.85rem;
+  min-width: 4rem;
+  padding: 0.25rem 0;
 }
 .forecast-date {
   font-weight: 600;
