@@ -2,34 +2,72 @@
 import React, { useState, useEffect } from 'react';
 import SearchBar from './components/SearchBar';
 import WeatherCard from './components/WeatherCard';
-import { WiDaySunny, WiNightClear } from 'react-icons/wi';
+import ChessGame from './components/ChessGame';
 import './App.css';
 
 function App() {
-  const [weatherDataList, setWeatherDataList] = useState([]);
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [darkMode, setDarkMode] = useState(false);
+  const [currentTab, setCurrentTab] = useState('weather');
 
+  // Weather state (single card)
+  const [weatherData, setWeatherData]   = useState(null);
+  const [weatherError, setWeatherError] = useState('');
+  const [weatherLoading, setWeatherLoading] = useState(false);
+
+  // Chess state
+  const [gameStarted, setGameStarted] = useState(false);
+  const [whiteTime, setWhiteTime]     = useState(0);
+  const [blackTime, setBlackTime]     = useState(0);
+  const [isWhiteTurn, setIsWhiteTurn] = useState(true);
+  const [chessMoves, setChessMoves]   = useState([]);
+  const [isCheck, setIsCheck]         = useState(false);
+
+  // Chess clock
   useEffect(() => {
-    document.body.classList.toggle('dark', darkMode);
-  }, [darkMode]);
+    if (!gameStarted) return;
+    const interval = setInterval(() => {
+      if (isWhiteTurn) setWhiteTime(t => t + 1);
+      else setBlackTime(t => t + 1);
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [gameStarted, isWhiteTurn]);
 
-  async function geocodeCity(city) {
-    const res = await fetch(
-      `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(city)}&count=1`
-    );
-    const json = await res.json();
-    if (!json.results?.length) throw new Error('Location not found');
-    const { latitude, longitude, name, country } = json.results[0];
-    return { latitude, longitude, name, country };
-  }
+  const handleMoveUpdate = (moves, inCheck) => {
+    setChessMoves(moves);
+    setIsCheck(inCheck);
+  };
+  const resetChess = () => {
+    setGameStarted(false);
+    setChessMoves([]);
+    setIsCheck(false);
+    setWhiteTime(0);
+    setBlackTime(0);
+    setIsWhiteTurn(true);
+  };
 
+  // Fetch weather + logs + US-only
   async function fetchWeather(city) {
-    setLoading(true);
-    setError('');
+    setWeatherLoading(true);
+    setWeatherError('');
     try {
-      const { latitude, longitude, name, country } = await geocodeCity(city);
+      const logs = [];
+
+      // Geocode
+      const geoUrl = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(
+        city
+      )}&count=1`;
+      logs.push(`🔍 Geocode Request: ${geoUrl}`);
+      const geoRes = await fetch(geoUrl);
+      const geoJson = await geoRes.json();
+      logs.push(`🔍 Geocode Response: ${JSON.stringify(geoJson)}`);
+
+      const loc = geoJson.results?.[0];
+      if (!loc) throw new Error('Location not found');
+      const { latitude, longitude, name, country, country_code } = loc;
+      if (country_code !== 'US') {
+        throw new Error('Please enter a location in the United States');
+      }
+
+      // Forecast
       const url = new URL('https://api.open-meteo.com/v1/forecast');
       url.search = new URLSearchParams({
         latitude,
@@ -38,80 +76,155 @@ function App() {
         daily: 'temperature_2m_max,temperature_2m_min',
         timezone: 'auto'
       }).toString();
-
+      logs.push(`☁️ Forecast Request: ${url}`);
       const res = await fetch(url);
+      const json = await res.json();
+      logs.push(`☁️ Forecast Response: ${JSON.stringify(json)}`);
+
       if (!res.ok) throw new Error('Weather data unavailable');
-      const { current_weather, daily } = await res.json();
 
-      const { temperature, windspeed } = current_weather;
+      const {
+        current_weather: { temperature, windspeed },
+        daily
+      } = json;
 
-      setWeatherDataList(prev => {
-        const next = [
-          ...prev,
-          {
-            id: Date.now(),
-            name,
-            country,
-            temperature,
-            windspeed,
-            daily
-          }
-        ];
-        return next.length > 5 ? next.slice(next.length - 5) : next;
+      setWeatherData({
+        id: Date.now(),
+        name,
+        country,
+        temperature,
+        windspeed,
+        daily,
+        logs
       });
     } catch (err) {
-      setError(err.message);
+      setWeatherError(err.message);
+      setWeatherData(null);
     } finally {
-      setLoading(false);
+      setWeatherLoading(false);
     }
   }
 
-  function handleRemove(id) {
-    setWeatherDataList(prev => prev.filter(card => card.id !== id));
-  }
+  const clearWeather = () => {
+    setWeatherData(null);
+    setWeatherError('');
+  };
 
   return (
     <div className="app-container">
-      <div className="app-inner">
+      {/* Tabs */}
+      <nav className="tabs">
         <button
-          className="theme-toggle"
-         onClick={() => setDarkMode(d => !d)}
-          aria-label="Toggle theme"
+          className={currentTab === 'weather' ? 'tab active' : 'tab'}
+          onClick={() => setCurrentTab('weather')}
         >
-          {darkMode ? (
-            <WiDaySunny size={40} color="#FFD700" />
+          Weather
+        </button>
+        <button
+          className={currentTab === 'chess' ? 'tab active' : 'tab'}
+          onClick={() => setCurrentTab('chess')}
+        >
+          Chess
+        </button>
+      </nav>
+
+      {/* WEATHER VIEW */}
+      {currentTab === 'weather' && (
+        <>
+          <div className="app-inner">
+            <h1>Weather App</h1>
+            <SearchBar
+              onSearch={fetchWeather}
+              placeholder="Enter U.S. city…"
+            />
+            {weatherLoading && <p>Loading…</p>}
+            {weatherError && <p className="error">{weatherError}</p>}
+          </div>
+          <div className="cards-container">
+            {weatherData && (
+              <WeatherCard
+                data={weatherData}
+                onRemove={clearWeather}
+              />
+            )}
+          </div>
+        </>
+      )}
+
+      {/* CHESS VIEW */}
+      {currentTab === 'chess' && (
+        <div className="app-inner">
+          <h1>Chess Game</h1>
+
+          {!gameStarted ? (
+            <button
+              className="btn btn-primary"
+              onClick={() => setGameStarted(true)}
+            >
+              Start Game
+            </button>
           ) : (
-            <WiNightClear size={40} color="#333333" />
-          )}        
-          </button>
+            <button
+              className="btn btn-outline btn-error"
+              onClick={resetChess}
+            >
+              End Game / Reset
+            </button>
+          )}
 
-        <h1>Hendrix's Weather App</h1>
+          <div className="chess-layout">
+            <div className={gameStarted ? 'chess-area' : 'chess-area disabled'}>
+              {isCheck && (
+                <div className="check-alert">
+                  ♟ Check! The king is in check!
+                </div>
+              )}
+              <ChessGame
+                moves={chessMoves}
+                onMoveUpdate={handleMoveUpdate}
+                onTurnChange={setIsWhiteTurn}
+              />
+            </div>
 
-        <SearchBar
-          onSearch={fetchWeather}
-          placeholder={
-            weatherDataList.length < 10 ? 'Enter city name…' : 'Max 10 reached'
-          }
-          disabled={weatherDataList.length >= 10}
-        />
-
-        {loading && <p>Loading…</p>}
-        {error && <p className="error">{error}</p>}
-      </div>
-
-      <div className="cards-container">
-        {[...weatherDataList].reverse().map(card => (
-          <WeatherCard
-            key={card.id}
-            data={card}
-            onRemove={() => handleRemove(card.id)}
-          />
-        ))}
-      </div>
+            {gameStarted && (
+              <div className="move-history">
+                <div className="timers">
+                  <span>♟ White Time: {whiteTime}s</span>
+                  <span>♙ Black Time: {blackTime}s</span>  
+                </div>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Turn</th>
+                      <th>White</th>
+                      <th>Black</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {Array.from({ length: Math.ceil(chessMoves.length / 2) }).map((_, i) => (
+                      <tr key={i}>
+                        <td>{i + 1}</td>
+                        <td>{chessMoves[2 * i] || ''}</td>
+                        <td>{chessMoves[2 * i + 1] || ''}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
 
 export default App;
+
+
+
+
+
+
 
 

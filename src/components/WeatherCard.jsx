@@ -1,15 +1,14 @@
+// src/components/WeatherCard.jsx
 import React from 'react';
 
 export default function WeatherCard({ data, onRemove }) {
-  const { name, country, temperature, windspeed, daily } = data;
+  const { name, country, temperature, windspeed, daily, logs } = data;
   const fahrenheit = (temperature * 9) / 5 + 32;
-
-  
-  const daysToShow = daily.time.slice(1, 6);
+  const nextDays = daily.time.slice(1, 6);
 
   return (
     <div className="weather-card">
-      <button className="remove-btn" onClick={onRemove} aria-label="Remove card">
+      <button className="remove-btn" onClick={onRemove} aria-label="Remove">
         ×
       </button>
       <h2>
@@ -24,7 +23,7 @@ export default function WeatherCard({ data, onRemove }) {
       </p>
 
       <div className="forecast-container">
-        {daysToShow.map((day, i) => (
+        {nextDays.map((day, i) => (
           <div key={day} className="forecast-day">
             <div className="forecast-date">
               {new Date(day).toLocaleDateString(undefined, {
@@ -44,8 +43,20 @@ export default function WeatherCard({ data, onRemove }) {
           </div>
         ))}
       </div>
+
+      <details className="api-logs">
+        <summary>Show API Process</summary>
+        <ul>
+          {logs.map((line, idx) => (
+            <li key={idx}>
+              <code>{line}</code>
+            </li>
+          ))}
+        </ul>
+      </details>
     </div>
   );
 }
+
 
 
