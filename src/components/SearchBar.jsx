@@ -1,103 +1,122 @@
-import React, { useState, useEffect, useRef } from 'react';
+// src/components/SearchBar.jsx
+import React, { useState, useEffect, useRef } from 'react'
 
-export default function SearchBar({ onSearch, placeholder = '', disabled = false }) {
-  const [query, setQuery] = useState('');
-  const [suggestions, setSuggestions] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const debounceRef = useRef(null);
-  const wrapperRef = useRef(null);
+export default function SearchBar({ onSearch, placeholder }) {
+  const [query, setQuery]                     = useState('')
+  const [suggestions, setSuggestions]         = useState([])
+  const [showSuggestions, setShowSuggestions] = useState(false)
+  const abortCtrlRef                          = useRef(null)
+  const debounceRef                           = useRef(null)
 
-  // Fetch suggestions when `query` changes, debounced
+  // Debounced fetch for U.S. cities
   useEffect(() => {
-    if (disabled || query.trim().length < 2) {
-      setSuggestions([]);
-      return;
+    if (!query) {
+      setSuggestions([])
+      return
     }
-    setLoading(true);
-    clearTimeout(debounceRef.current);
-    debounceRef.current = setTimeout(async () => {
-      try {
-        const url = new URL('https://geocoding-api.open-meteo.com/v1/search');
-        url.search = new URLSearchParams({
-          name: query.trim(),
-          count: 5,
-          country_code: 'US'
-        }).toString();
+    clearTimeout(debounceRef.current)
+    debounceRef.current = setTimeout(() => {
+      if (abortCtrlRef.current) abortCtrlRef.current.abort()
+      const ctrl = new AbortController()
+      abortCtrlRef.current = ctrl
 
-        const res = await fetch(url);
-        const json = await res.json();
-        if (json.results) {
+      fetch(
+        `https://geocoding-api.open-meteo.com/v1/search?` +
+        `name=${encodeURIComponent(query)}&count=5&country=US`,
+        { signal: ctrl.signal }
+      )
+        .then(res => res.json())
+        .then(json => {
+          const results = json.results || []
           setSuggestions(
-            json.results.map(loc => ({
-              name: loc.name,
-              region: loc.admin1 || loc.country,
+            results.map(r => ({
+              display: `${r.name}, ${r.admin1}`,
+              raw: r.name
             }))
-          );
-        } else {
-          setSuggestions([]);
-        }
-      } catch {
-        setSuggestions([]);
-      } finally {
-        setLoading(false);
-      }
-    }, 300);
-
-    return () => clearTimeout(debounceRef.current);
-  }, [query, disabled]);
-
-  // Close suggestions on outside click
-  useEffect(() => {
-    function onClick(e) {
-      if (wrapperRef.current && !wrapperRef.current.contains(e.target)) {
-        setSuggestions([]);
-      }
+          )
+          setShowSuggestions(results.length > 0)
+        })
+        .catch(() => {
+          setSuggestions([])
+        })
+    }, 300)
+    return () => {
+      clearTimeout(debounceRef.current)
+      if (abortCtrlRef.current) abortCtrlRef.current.abort()
     }
-    document.addEventListener('mousedown', onClick);
-    return () => document.removeEventListener('mousedown', onClick);
-  }, []);
+  }, [query])
 
-  const handleSelect = locName => {
-    setQuery(locName);
-    setSuggestions([]);
-    onSearch(locName);
-  };
+  const doSearch = val => {
+    setQuery(val)
+    setShowSuggestions(false)
+    onSearch(val)
+  }
 
-  const handleSubmit = e => {
-    e.preventDefault();
-    if (!query.trim() || disabled) return;
-    setSuggestions([]);
-    onSearch(query.trim());
-  };
+  const clearQuery = () => {
+    setQuery('')
+    setSuggestions([])
+    setShowSuggestions(false)
+  }
 
   return (
-    <div className="search-bar-wrapper" ref={wrapperRef}>
-      <form onSubmit={handleSubmit} className="search-bar">
-        <input
-          type="text"
-          value={query}
-          onChange={e => setQuery(e.target.value)}
-          placeholder={placeholder}
-          disabled={disabled}
-        />
-        <button type="submit" disabled={disabled}>
+    <div className="search-bar-wrapper">
+      <div className="search-bar">
+        <div className="input-wrapper">
+          <input
+            type="text"
+            value={query}
+            placeholder={placeholder}
+            onChange={e => setQuery(e.target.value)}
+            onFocus={() => query && setShowSuggestions(true)}
+            onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
+          />
+          {query && (
+            <button
+              type="button"
+              className="clear-button"
+              onMouseDown={clearQuery}
+              aria-label="Clear text"
+            >
+              ×
+            </button>
+          )}
+        </div>
+
+        <button
+          type="button"
+          className="search-button"
+          onClick={() => doSearch(query.trim())}
+          disabled={!query.trim()}
+        >
           Search
         </button>
-      </form>
+      </div>
 
-      {loading && <div className="suggestions"><em>Loading…</em></div>}
-
-      {!loading && suggestions.length > 0 && (
-        <ul className="suggestions">
-          {suggestions.map((s, i) => (
-            <li key={i} onClick={() => handleSelect(s.name)}>
-              {s.name}, {s.region}
-            </li>
-          ))}
-        </ul>
+      {showSuggestions && suggestions.length > 0 && (
+        <div className="suggestions-container">
+          <button
+            type="button"
+            className="suggestions-close"
+            onMouseDown={() => setShowSuggestions(false)}
+            aria-label="Close suggestions"
+          >
+            ×
+          </button>
+          <ul className="suggestions">
+            {suggestions.map((loc, i) => (
+              <li key={i} onMouseDown={() => doSearch(loc.raw)}>
+                {loc.display}
+              </li>
+            ))}
+          </ul>
+        </div>
       )}
     </div>
-  );
+  )
 }
+
+
+
+
 
 

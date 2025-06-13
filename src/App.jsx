@@ -13,12 +13,12 @@ export default function App() {
   const [loading, setLoading]           = useState(false)
 
   // Chess state
-  const [started, setStarted]       = useState(false)
-  const [whiteTime, setWhiteTime]   = useState(0)
-  const [blackTime, setBlackTime]   = useState(0)
+  const [started, setStarted]         = useState(false)
+  const [whiteTime, setWhiteTime]     = useState(0)
+  const [blackTime, setBlackTime]     = useState(0)
   const [isWhiteTurn, setIsWhiteTurn] = useState(true)
-  const [moves, setMoves]           = useState([])
-  const [inCheck, setInCheck]       = useState(false)
+  const [moves, setMoves]             = useState([])
+  const [inCheck, setInCheck]         = useState(false)
 
   // Chess clock
   useEffect(() => {
@@ -29,14 +29,13 @@ export default function App() {
     return () => clearInterval(iv)
   }, [started, isWhiteTurn])
 
-  // Fetch weather (US-only) with logs
+  // Fetch weather + US-only + logs
   async function fetchWeather(city) {
     setLoading(true)
     setWeatherError('')
     try {
       const logs = []
-
-      // Geocode
+      // 1) Geocode
       const geoUrl = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(
         city
       )}&count=1`
@@ -48,7 +47,7 @@ export default function App() {
       if (!loc) throw new Error('Location not found')
       if (loc.country_code !== 'US') throw new Error('Please enter a U.S. city')
 
-      // Forecast
+      // 2) Forecast
       const url = new URL('https://api.open-meteo.com/v1/forecast')
       url.search = new URLSearchParams({
         latitude: loc.latitude,
@@ -101,7 +100,7 @@ export default function App() {
 
   return (
     <div className="app-container">
-      {/* Nav */}
+      {/* fixed nav */}
       <nav className="tabs">
         {['weather', 'chess'].map(p => (
           <button
@@ -114,15 +113,35 @@ export default function App() {
         ))}
       </nav>
 
+      {/* INFO CARD */}
+      {tab === 'weather' && (
+        <details className="info-card">
+          <summary>About the Weather App</summary>
+          <p>
+            Enter any U.S. city to see the current temperature (°C/°F), wind speed,
+            and a 5-day high/low forecast. Under the hood we geocode via Open-Meteo
+            then fetch current+daily data and log each API step.
+          </p>
+        </details>
+      )}
+      {tab === 'chess' && (
+        <details className="info-card">
+          <summary>About the Chess Game</summary>
+          <p>
+            An interactive chessboard powered by <code>react-chessboard</code> and
+            <code>chess.js</code>. Each side has its own timer, moves are validated,
+            and you can review move history in the companion table.
+          </p>
+        </details>
+      )}
+
+      {/* WEATHER VIEW */}
       {tab === 'weather' ? (
         <>
           <h1>Weather App</h1>
-
           <SearchBar onSearch={fetchWeather} placeholder="Enter U.S. city…" />
-
           {loading && <p className="status">Loading…</p>}
           {weatherError && <p className="error">{weatherError}</p>}
-
           <div className="cards-container">
             {weatherData && (
               <WeatherCard data={weatherData} onRemove={clearWeather} />
@@ -132,7 +151,6 @@ export default function App() {
       ) : (
         <>
           <h1>Chess Game</h1>
-
           {!started ? (
             <button className="btn btn-primary" onClick={() => setStarted(true)}>
               Start Game
@@ -142,10 +160,9 @@ export default function App() {
               End / Reset
             </button>
           )}
-
           <div className="chess-layout">
             <div className={started ? 'chess-area' : 'chess-area disabled'}>
-              {inCheck && <div className="check-alert">♟ Check!</div>}
+              {inCheck && <div className="check-alert">♟ The King is in Check!</div>}
               <ChessGame
                 moves={moves}
                 onMoveUpdate={(m, c) => {
@@ -187,6 +204,7 @@ export default function App() {
     </div>
   )
 }
+
 
 
 
