@@ -139,7 +139,7 @@ export default function App() {
       {tab === 'weather' ? (
         <>
           <h1>Weather App</h1>
-          <SearchBar onSearch={fetchWeather} placeholder="Enter U.S. city…" />
+          <SearchBar onSearch={fetchWeather} placeholder="Enter a U.S. city..." />
           {loading && <p className="status">Loading…</p>}
           {weatherError && <p className="error">{weatherError}</p>}
           <div className="cards-container">

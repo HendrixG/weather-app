@@ -38,7 +38,7 @@ export default function WeatherCard({ data, onRemove }) {
       </div>
 
       <details className="api-logs">
-        <summary>Show API Process</summary>
+        <summary>Show API Process Info</summary>
         <ul>
           {logs.map((ln, idx) => (
             <li key={idx}><code>{ln}</code></li>
