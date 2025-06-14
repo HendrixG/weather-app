@@ -29,18 +29,19 @@ export default function App() {
     return () => clearInterval(iv)
   }, [started, isWhiteTurn])
 
-  // Fetch weather + US-only + logs
+  // Fetch weather + US-only + logs + include state
   async function fetchWeather(city) {
     setLoading(true)
     setWeatherError('')
     try {
       const logs = []
+
       // 1) Geocode
-      const geoUrl = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(
-        city
-      )}&count=1`
+      const geoUrl =
+        `https://geocoding-api.open-meteo.com/v1/search?` +
+        `name=${encodeURIComponent(city)}&count=1`
       logs.push(`🔍 ${geoUrl}`)
-      const geoRes = await fetch(geoUrl)
+      const geoRes  = await fetch(geoUrl)
       const geoJson = await geoRes.json()
       logs.push(`🔍 ${JSON.stringify(geoJson)}`)
       const loc = geoJson.results?.[0]
@@ -50,14 +51,15 @@ export default function App() {
       // 2) Forecast
       const url = new URL('https://api.open-meteo.com/v1/forecast')
       url.search = new URLSearchParams({
-        latitude: loc.latitude,
-        longitude: loc.longitude,
-        current_weather: 'true',
-        daily: 'temperature_2m_max,temperature_2m_min',
-        timezone: 'auto'
+        latitude:       loc.latitude,
+        longitude:      loc.longitude,
+        current_weather:'true',
+        daily:          'temperature_2m_max,temperature_2m_min',
+        timezone:       'auto'
       }).toString()
       logs.push(`☁️ ${url}`)
-      const res = await fetch(url)
+
+      const res  = await fetch(url)
       const data = await res.json()
       logs.push(`☁️ ${JSON.stringify(data)}`)
       if (!res.ok) throw new Error('Weather data unavailable')
@@ -67,10 +69,12 @@ export default function App() {
         daily
       } = data
 
+      // include name, state (admin1), country on the card
       setWeatherData({
-        id: Date.now(),
-        name: loc.name,
-        country: loc.country,
+        id:        Date.now(),
+        name:      loc.name,
+        state:     loc.admin1,
+        country:   loc.country,
         temperature,
         windspeed,
         daily,
@@ -120,7 +124,7 @@ export default function App() {
           <p>
             Enter any U.S. city to see the current temperature (°C/°F), wind speed,
             and a 5-day high/low forecast. Under the hood we geocode via Open-Meteo
-            then fetch current+daily data and log each API step.
+            then fetch current + daily data and log each API step.
           </p>
         </details>
       )}
@@ -139,12 +143,18 @@ export default function App() {
       {tab === 'weather' ? (
         <>
           <h1>Weather App</h1>
-          <SearchBar onSearch={fetchWeather} placeholder="Enter a U.S. city..." />
-          {loading && <p className="status">Loading…</p>}
-          {weatherError && <p className="error">{weatherError}</p>}
+          <SearchBar
+            onSearch={fetchWeather}
+            placeholder="Enter a U.S. city..."
+          />
+          {loading       && <p className="status">Loading…</p>}
+          {weatherError  && <p className="error">{weatherError}</p>}
           <div className="cards-container">
             {weatherData && (
-              <WeatherCard data={weatherData} onRemove={clearWeather} />
+              <WeatherCard
+                data={weatherData}
+                onRemove={clearWeather}
+              />
             )}
           </div>
         </>
@@ -152,17 +162,27 @@ export default function App() {
         <>
           <h1>Chess Game</h1>
           {!started ? (
-            <button className="btn btn-primary" onClick={() => setStarted(true)}>
+            <button
+              className="btn btn-primary"
+              onClick={() => setStarted(true)}
+            >
               Start Game
             </button>
           ) : (
-            <button className="btn btn-outline btn-error" onClick={resetChess}>
+            <button
+              className="btn btn-outline btn-error"
+              onClick={resetChess}
+            >
               End / Reset
             </button>
           )}
           <div className="chess-layout">
             <div className={started ? 'chess-area' : 'chess-area disabled'}>
-              {inCheck && <div className="check-alert">♟ The King is in Check!</div>}
+              {inCheck && (
+                <div className="check-alert">
+                  ♟ The King is in Check!
+                </div>
+              )}
               <ChessGame
                 moves={moves}
                 onMoveUpdate={(m, c) => {
@@ -204,6 +224,7 @@ export default function App() {
     </div>
   )
 }
+
 
 
 

@@ -27,9 +27,12 @@ export default function SearchBar({ onSearch, placeholder }) {
         .then(res => res.json())
         .then(json => {
           const rawResults = json.results || []
-          // Filter out state‐level entries (feature_code 'ADM1')
-          const cityResults = rawResults.filter(r => r.feature_code !== 'ADM1')
-          const mapped = cityResults.map(r => ({
+          // 1) Only keep U.S. entries
+          // 2) Exclude state‐level (ADM1) so only cities remain
+          const filtered = rawResults.filter(r =>
+            r.country_code === 'US' && r.feature_code !== 'ADM1'
+          )
+          const mapped = filtered.map(r => ({
             display: `${r.name}, ${r.admin1}`,
             raw: r.name
           }))
@@ -59,8 +62,10 @@ export default function SearchBar({ onSearch, placeholder }) {
     setShowSuggestions(false)
   }
 
-  // Only enable search when the input exactly matches one of our city 'raw' values
-  const canSearch = query.trim() !== '' && suggestions.some(s => s.raw === query.trim())
+  // Only enable “Search” when query matches one of our filtered suggestions
+  const canSearch =
+    query.trim() !== '' &&
+    suggestions.some(s => s.raw === query.trim())
 
   return (
     <div className="search-bar-wrapper">
@@ -80,7 +85,9 @@ export default function SearchBar({ onSearch, placeholder }) {
               className="clear-button"
               onMouseDown={clearQuery}
               aria-label="Clear text"
-            >×</button>
+            >
+              ×
+            </button>
           )}
         </div>
 
@@ -101,7 +108,9 @@ export default function SearchBar({ onSearch, placeholder }) {
             className="suggestions-close"
             onMouseDown={() => setShowSuggestions(false)}
             aria-label="Close suggestions"
-          >×</button>
+          >
+            ×
+          </button>
           <ul className="suggestions">
             {suggestions.map((loc, i) => (
               <li key={i} onMouseDown={() => doSearch(loc.raw)}>
@@ -114,6 +123,7 @@ export default function SearchBar({ onSearch, placeholder }) {
     </div>
   )
 }
+
 
 
 
