@@ -1,3 +1,4 @@
+// src/App.jsx
 import React, { useState, useEffect } from 'react'
 import SearchBar from './components/SearchBar'
 import WeatherCard from './components/WeatherCard'
@@ -24,7 +25,9 @@ export default function App() {
   useEffect(() => {
     if (!started) return
     const iv = setInterval(() => {
-      isWhiteTurn ? setWhiteTime(t => t + 1) : setBlackTime(t => t + 1)
+      isWhiteTurn
+        ? setWhiteTime(t => t + 1)
+        : setBlackTime(t => t + 1)
     }, 1000)
     return () => clearInterval(iv)
   }, [started, isWhiteTurn])
@@ -46,16 +49,17 @@ export default function App() {
       logs.push(`${JSON.stringify(geoJson)}`)
       const loc = geoJson.results?.[0]
       if (!loc) throw new Error('Location not found')
-      if (loc.country_code !== 'US') throw new Error('Please enter a U.S. city')
+      if (loc.country_code !== 'US')
+        throw new Error('Please enter a U.S. city')
 
       // 2) Forecast
       const url = new URL('https://api.open-meteo.com/v1/forecast')
       url.search = new URLSearchParams({
-        latitude:       loc.latitude,
-        longitude:      loc.longitude,
-        current_weather:'true',
-        daily:          'temperature_2m_max,temperature_2m_min',
-        timezone:       'auto'
+        latitude:        loc.latitude,
+        longitude:       loc.longitude,
+        current_weather: 'true',
+        daily:           'temperature_2m_max,temperature_2m_min',
+        timezone:        'auto'
       }).toString()
       logs.push(`${url}`)
 
@@ -69,12 +73,11 @@ export default function App() {
         daily
       } = data
 
-      // include name, state (admin1), country on the card
       setWeatherData({
-        id:        Date.now(),
-        name:      loc.name,
-        state:     loc.admin1,
-        country:   loc.country,
+        id:          Date.now(),
+        name:        loc.name,
+        state:       loc.admin1,
+        country:     loc.country,
         temperature,
         windspeed,
         daily,
@@ -117,38 +120,27 @@ export default function App() {
         ))}
       </nav>
 
-      {/* INFO CARD */}
-      {tab === 'weather' && (
-        <details className="info-card">
-          <summary>About the Weather</summary>
-          <p>
-            Enter any U.S. city to see the current temperature (°F), wind speed,
-            and a 5-day high/low forecast. From the backend we geocode via Open-Meteo
-            then fetch current + daily data and log each API step.
-          </p>
-        </details>
-      )}
-      {tab === 'chess' && (
-        <details className="info-card">
-          <summary>About the Chess Game</summary>
-          <p>
-            A React-based chessboard utilizing <code>react-chessboard</code> and
-            <code>chess.js</code>. Each side has its own timer, moves are validated,
-            and you can review move history in the companion table.
-          </p>
-        </details>
-      )}
-
       {/* WEATHER VIEW */}
       {tab === 'weather' ? (
         <>
           <h1>Weather</h1>
+
+          {/* info-card moved below the h1 */}
+          <details className="info-card">
+            <summary>About the Weather</summary>
+            <p>
+              Enter any U.S. city to see the current temperature (°F), wind speed,
+              and a 5-day high/low forecast. From the backend we geocode via Open-Meteo
+              then fetch current + daily data and log each API step.
+            </p>
+          </details>
+
           <SearchBar
             onSearch={fetchWeather}
             placeholder="Enter a U.S. city..."
           />
-          {loading       && <p className="status">Loading…</p>}
-          {weatherError  && <p className="error">{weatherError}</p>}
+          {loading      && <p className="status">Loading…</p>}
+          {weatherError && <p className="error">{weatherError}</p>}
           <div className="cards-container">
             {weatherData && (
               <WeatherCard
@@ -161,6 +153,17 @@ export default function App() {
       ) : (
         <>
           <h1>Chess Game</h1>
+
+          {/* info-card moved below the h1 */}
+          <details className="info-card">
+            <summary>About the Chess Game</summary>
+            <p>
+              A React-based chessboard utilizing <code>react-chessboard</code> and
+              <code>chess.js</code>. Each side has its own timer, moves are validated,
+              and you can review move history in the companion table.
+            </p>
+          </details>
+
           {!started ? (
             <button
               className="btn btn-primary"
@@ -195,15 +198,15 @@ export default function App() {
             {started && (
               <div className="move-history">
                 <div className="timers">
-                  <span>♟{whiteTime}s</span>
-                  <span>♙{blackTime}s</span> s
+                  <span>♟ {whiteTime}s</span>
+                  <span>♙ {blackTime}s</span>
                 </div>
                 <table>
                   <thead>
                     <tr>
-                      <th>Player Turn</th>
-                      <th>White</th>
-                      <th>Black</th>
+                      <th>Turn</th>
+                      <th>W</th>
+                      <th>B</th>
                     </tr>
                   </thead>
                   <tbody>
