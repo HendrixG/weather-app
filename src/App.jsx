@@ -40,10 +40,10 @@ export default function App() {
       const geoUrl =
         `https://geocoding-api.open-meteo.com/v1/search?` +
         `name=${encodeURIComponent(city)}&count=1`
-      logs.push(`🔍 ${geoUrl}`)
+      logs.push(`${geoUrl}`)
       const geoRes  = await fetch(geoUrl)
       const geoJson = await geoRes.json()
-      logs.push(`🔍 ${JSON.stringify(geoJson)}`)
+      logs.push(`${JSON.stringify(geoJson)}`)
       const loc = geoJson.results?.[0]
       if (!loc) throw new Error('Location not found')
       if (loc.country_code !== 'US') throw new Error('Please enter a U.S. city')
@@ -57,11 +57,11 @@ export default function App() {
         daily:          'temperature_2m_max,temperature_2m_min',
         timezone:       'auto'
       }).toString()
-      logs.push(`☁️ ${url}`)
+      logs.push(`${url}`)
 
       const res  = await fetch(url)
       const data = await res.json()
-      logs.push(`☁️ ${JSON.stringify(data)}`)
+      logs.push(`${JSON.stringify(data)}`)
       if (!res.ok) throw new Error('Weather data unavailable')
 
       const {
@@ -122,7 +122,7 @@ export default function App() {
         <details className="info-card">
           <summary>About the Weather App</summary>
           <p>
-            Enter any U.S. city to see the current temperature (°C/°F), wind speed,
+            Enter any U.S. city to see the current temperature (°F), wind speed,
             and a 5-day high/low forecast. Under the hood we geocode via Open-Meteo
             then fetch current + daily data and log each API step.
           </p>
@@ -132,7 +132,7 @@ export default function App() {
         <details className="info-card">
           <summary>About the Chess Game</summary>
           <p>
-            An interactive chessboard powered by <code>react-chessboard</code> and
+            A React-based chessboard utilizing <code>react-chessboard</code> and
             <code>chess.js</code>. Each side has its own timer, moves are validated,
             and you can review move history in the companion table.
           </p>
@@ -195,15 +195,15 @@ export default function App() {
             {started && (
               <div className="move-history">
                 <div className="timers">
-                  <span>♙ {whiteTime}s</span>
-                  <span>♟ {blackTime}s</span>
+                  <span>♟{whiteTime}s</span>
+                  <span>♙{blackTime}s</span> s
                 </div>
                 <table>
                   <thead>
                     <tr>
-                      <th>Turn</th>
-                      <th>W</th>
-                      <th>B</th>
+                      <th>Player Turn</th>
+                      <th>White</th>
+                      <th>Black</th>
                     </tr>
                   </thead>
                   <tbody>
