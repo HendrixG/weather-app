@@ -73,9 +73,3 @@ export default function WeatherCard({ data, onRemove }) {
     </div>
   )
 }
-
-
-
-
-
-

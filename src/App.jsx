@@ -120,10 +120,10 @@ export default function App() {
       {/* INFO CARD */}
       {tab === 'weather' && (
         <details className="info-card">
-          <summary>About the Weather App</summary>
+          <summary>About the Weather</summary>
           <p>
             Enter any U.S. city to see the current temperature (°F), wind speed,
-            and a 5-day high/low forecast. Under the hood we geocode via Open-Meteo
+            and a 5-day high/low forecast. From the backend we geocode via Open-Meteo
             then fetch current + daily data and log each API step.
           </p>
         </details>
@@ -142,7 +142,7 @@ export default function App() {
       {/* WEATHER VIEW */}
       {tab === 'weather' ? (
         <>
-          <h1>Weather App</h1>
+          <h1>Weather</h1>
           <SearchBar
             onSearch={fetchWeather}
             placeholder="Enter a U.S. city..."
@@ -224,14 +224,3 @@ export default function App() {
     </div>
   )
 }
-
-
-
-
-
-
-
-
-
-
-

@@ -123,11 +123,3 @@ export default function SearchBar({ onSearch, placeholder }) {
     </div>
   )
 }
-
-
-
-
-
-
-
-
