@@ -453,7 +453,6 @@ h1 {
 @media (max-width: 600px) {
   /* container padding & centering */
   .app-container {
-    /* restore top offset so we sit below the fixed nav + info-gap */
     margin-top: calc(24px + var(--nav-height) + var(--info-gap));
     padding: var(--space-sm);
     padding-bottom: var(--space-lg);
@@ -481,7 +480,7 @@ h1 {
     width: 100%;
   }
 
-  /* keep the search bar inline (no stacking) */
+  /* keep the search bar inline */
   .search-bar {
     flex-direction: row;
   }
@@ -559,17 +558,31 @@ h1 {
     min-height: 32px;
     padding: var(--space-xs);
   }
-    /*────────────────────────────────────
+
+  /*────────────────────────────────────
     Responsive Chess View Tweaks
   ────────────────────────────────────*/
-  /* 1) Chessboard scales to full width */
+
+  /* 1) Chessboard wrapper scales fluidly to its parent */
+  .chess-area,
+  .chess-area > div,
+  .chess-area > div > div,
   .chess-area [data-boardid] {
-    width: 100%   !important;
+    width: 100% !important;
     max-width: 100% !important;
-    aspect-ratio: 1 / 1;
     height: auto  !important;
+  }
+
+  /* preserve touch dragging */
+  .chess-area,
+  .chess-area [data-boardid] {
     touch-action: none;
     overscroll-behavior: contain;
+  }
+
+  /* add a bit of side padding on narrow screens */
+  .chess-area {
+    padding: 0 var(--space-sm);
   }
 
   /* 2) Move-history becomes full–width & scrollable */
@@ -582,7 +595,6 @@ h1 {
     display: block;
     width: 100%;
     overflow-x: auto;
-    /* tiny shadow so user sees it scrolls horizontally */
     box-shadow: inset 0 -2px 4px rgba(0,0,0,0.2);
   }
   .move-history th,
@@ -591,7 +603,7 @@ h1 {
     font-size: 0.875rem;
   }
 
-  /* 3) Reduce title size a bit to avoid crowding */
+  /* 3) Slightly smaller titles in chess view */
   .chess-layout h1,
   .move-history h2 {
     font-size: 1.5rem;
