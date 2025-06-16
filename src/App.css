@@ -560,3 +560,14 @@ h1 {
     padding: var(--space-xs);
   }
 }
+
+/*────────────────────────────────────
+   Make the chessboard draggable on touch
+────────────────────────────────────*/
+.chess-area,
+.react-chessboard {
+  /* tell the browser: don’t steal my touch drags to scroll the page */
+  touch-action: none;
+  /* contain any overscroll so it never “bounces” the container */
+  overscroll-behavior: contain;
+}
