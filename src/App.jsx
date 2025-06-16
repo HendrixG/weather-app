@@ -32,27 +32,30 @@ export default function App() {
     return () => clearInterval(iv)
   }, [started, isWhiteTurn])
 
-  // Fetch weather + US-only + logs + include state
-  async function fetchWeather(city) {
+  // Fetch weather + US-only + logs + pick correct state match
+  async function fetchWeather(cityRaw) {
     setLoading(true)
     setWeatherError('')
     try {
       const logs = []
 
-      // 1) Geocode
+      // 1) Parse out city and state
+      const [cityName, stateName] = cityRaw.split(',').map(s => s.trim())
+
+      // 2) Geocode up to 5 U.S. results, then choose the one in our state
       const geoUrl =
         `https://geocoding-api.open-meteo.com/v1/search?` +
-        `name=${encodeURIComponent(city)}&count=1`
-      logs.push(`${geoUrl}`)
+        `name=${encodeURIComponent(cityName)}&count=5&country=US`
+      logs.push(`🔍 ${geoUrl}`)
       const geoRes  = await fetch(geoUrl)
       const geoJson = await geoRes.json()
-      logs.push(`${JSON.stringify(geoJson)}`)
-      const loc = geoJson.results?.[0]
+      logs.push(`🔍 ${JSON.stringify(geoJson)}`)
+      const loc = (geoJson.results || []).find(
+        r => r.country_code === 'US' && r.admin1 === stateName
+      )
       if (!loc) throw new Error('Location not found')
-      if (loc.country_code !== 'US')
-        throw new Error('Please enter a U.S. city')
 
-      // 2) Forecast
+      // 3) Fetch forecast
       const url = new URL('https://api.open-meteo.com/v1/forecast')
       url.search = new URLSearchParams({
         latitude:        loc.latitude,
@@ -61,11 +64,10 @@ export default function App() {
         daily:           'temperature_2m_max,temperature_2m_min',
         timezone:        'auto'
       }).toString()
-      logs.push(`${url}`)
-
+      logs.push(`☁️ ${url}`)
       const res  = await fetch(url)
       const data = await res.json()
-      logs.push(`${JSON.stringify(data)}`)
+      logs.push(`☁️ ${JSON.stringify(data)}`)
       if (!res.ok) throw new Error('Weather data unavailable')
 
       const {
@@ -73,6 +75,7 @@ export default function App() {
         daily
       } = data
 
+      // 4) Save to state (including name, state, country, logs, etc)
       setWeatherData({
         id:          Date.now(),
         name:        loc.name,
@@ -125,13 +128,13 @@ export default function App() {
         <>
           <h1>Weather</h1>
 
-          {/* info-card moved below the h1 */}
           <details className="info-card">
             <summary>About the Weather</summary>
             <p>
               Enter any U.S. city to see the current temperature (°F), wind speed,
-              and a 5-day high/low forecast. From the backend we geocode via Open-Meteo
-              then fetch current + daily data and log each API step.
+              and a 5-day high/low forecast. Under the hood we geocode via Open-Meteo,
+              fetch several US results, pick the one matching your state, then log
+              each API step.
             </p>
           </details>
 
@@ -154,7 +157,6 @@ export default function App() {
         <>
           <h1>Chess Game</h1>
 
-          {/* info-card moved below the h1 */}
           <details className="info-card">
             <summary>About the Chess Game</summary>
             <p>
@@ -227,3 +229,4 @@ export default function App() {
     </div>
   )
 }
+

@@ -1,4 +1,3 @@
-// src/components/SearchBar.jsx
 import React, { useState, useEffect, useRef } from 'react'
 
 export default function SearchBar({ onSearch, placeholder }) {
@@ -27,14 +26,14 @@ export default function SearchBar({ onSearch, placeholder }) {
         .then(res => res.json())
         .then(json => {
           const rawResults = json.results || []
-          // 1) Only keep U.S. entries
-          // 2) Exclude state‐level (ADM1) so only cities remain
+          // only U.S. cities, no state-level entries
           const filtered = rawResults.filter(r =>
             r.country_code === 'US' && r.feature_code !== 'ADM1'
           )
           const mapped = filtered.map(r => ({
             display: `${r.name}, ${r.admin1}`,
-            raw: r.name
+            // **only** city + state here
+            raw:     `${r.name}, ${r.admin1}`
           }))
           setSuggestions(mapped)
           setShowSuggestions(mapped.length > 0)
@@ -44,6 +43,7 @@ export default function SearchBar({ onSearch, placeholder }) {
           setShowSuggestions(false)
         })
     }, 300)
+
     return () => {
       clearTimeout(debounceRef.current)
       if (abortCtrlRef.current) abortCtrlRef.current.abort()
@@ -53,7 +53,7 @@ export default function SearchBar({ onSearch, placeholder }) {
   const doSearch = val => {
     setQuery(val)
     setShowSuggestions(false)
-    onSearch(val)
+    onSearch(val)           // now passes "Madison, Wisconsin"
   }
 
   const clearQuery = () => {
@@ -62,7 +62,6 @@ export default function SearchBar({ onSearch, placeholder }) {
     setShowSuggestions(false)
   }
 
-  // Only enable “Search” when query matches one of our filtered suggestions
   const canSearch =
     query.trim() !== '' &&
     suggestions.some(s => s.raw === query.trim())
@@ -72,7 +71,6 @@ export default function SearchBar({ onSearch, placeholder }) {
       <div className="search-bar">
         <div className="input-wrapper">
           <input
-            type="text"
             value={query}
             placeholder={placeholder}
             onChange={e => setQuery(e.target.value)}
@@ -81,7 +79,6 @@ export default function SearchBar({ onSearch, placeholder }) {
           />
           {query && (
             <button
-              type="button"
               className="clear-button"
               onMouseDown={clearQuery}
               aria-label="Clear text"
@@ -92,8 +89,6 @@ export default function SearchBar({ onSearch, placeholder }) {
         </div>
 
         <button
-          type="button"
-          className="search-button"
           onClick={() => doSearch(query.trim())}
           disabled={!canSearch}
         >
@@ -104,7 +99,6 @@ export default function SearchBar({ onSearch, placeholder }) {
       {showSuggestions && suggestions.length > 0 && (
         <div className="suggestions-container">
           <button
-            type="button"
             className="suggestions-close"
             onMouseDown={() => setShowSuggestions(false)}
             aria-label="Close suggestions"
@@ -112,7 +106,7 @@ export default function SearchBar({ onSearch, placeholder }) {
             ×
           </button>
           <ul className="suggestions">
-            {suggestions.map((loc, i) => (
+            {suggestions.map((loc,i) => (
               <li key={i} onMouseDown={() => doSearch(loc.raw)}>
                 {loc.display}
               </li>
