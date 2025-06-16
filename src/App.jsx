@@ -32,7 +32,7 @@ export default function App() {
     return () => clearInterval(iv)
   }, [started, isWhiteTurn])
 
-  // Fetch weather + US-only + logs + pick correct state match
+  // Fetch weather, US-only, logs, pick correct state match
   async function fetchWeather(cityRaw) {
     setLoading(true)
     setWeatherError('')

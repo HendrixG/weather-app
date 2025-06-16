@@ -474,3 +474,116 @@ h1 {
   }
   .tabs { justify-content: center; }
 }
+
+/*────────────────────────────────────
+  MOBILE LAYOUT (max‐width 600px)
+────────────────────────────────────*/
+@media (max-width: 600px) {
+  /* container padding & centering */
+  .app-container {
+    padding: var(--space-sm);
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  /* nav pills full‐width & centered */
+  .tabs {
+    width: calc(100% - 2 * var(--space-sm));
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 6px var(--space-sm);
+    gap: var(--space-xs);
+  }
+
+  /* section titles */
+  h1 {
+    font-size: 1.75rem;
+    margin-bottom: var(--space-md);
+  }
+
+  /* info cards full‐width under nav */
+  .info-card {
+    margin: var(--space-sm) auto var(--space-lg);
+    width: 100%;
+  }
+
+  /* search bar stacked */
+  .search-bar-wrapper {
+    width: 100%;
+    margin: var(--space-md) auto var(--space-lg);
+    padding: 0;
+  }
+  .search-bar {
+    flex-direction: column;
+    gap: var(--space-xs);
+  }
+  .search-bar input,
+  .search-bar button {
+    width: 100%;
+    margin: 0;
+  }
+
+  /* suggestions full width */
+  .suggestions-container {
+    width: 100%;
+    left: 0;
+    right: 0;
+    top: calc(100% + var(--space-xs));
+  }
+
+  /* cards container stacks */
+  .cards-container {
+    flex-direction: column;
+    align-items: center;
+    margin-top: var(--space-md);
+  }
+
+  /* each weather card full‐width */
+  .weather-card {
+    width: 100%;
+    padding: var(--space-md);
+  }
+
+  /* forecast strips stack vertically */
+  .forecast-container {
+    flex-direction: column;
+    gap: var(--space-sm);
+    margin-top: var(--space-md);
+  }
+  .forecast-day {
+    width: 100%;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: var(--space-xs) var(--space-sm);
+  }
+
+  /* chess layout stacks */
+  .chess-layout {
+    flex-direction: column;
+    gap: var(--space-lg);
+    margin-top: var(--space-lg);
+    padding: 0;
+  }
+  .chess-area,
+  .move-history {
+    width: 100%;
+    max-width: none;
+  }
+  .move-history table {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+  }
+
+  /* tighten up status & error text */
+  .status, .error {
+    font-size: 0.9rem;
+    margin: var(--space-sm) 0;
+  }
+
+  /* button spacing */
+  .btn {
+    width: 100%;
+    margin-bottom: var(--space-md);
+  }
+}
