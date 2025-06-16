@@ -9,17 +9,17 @@ export default function App() {
   const [tab, setTab] = useState('weather')
 
   // Weather state
-  const [weatherData, setWeatherData]   = useState(null)
+  const [weatherData, setWeatherData] = useState(null)
   const [weatherError, setWeatherError] = useState('')
-  const [loading, setLoading]           = useState(false)
+  const [loading, setLoading] = useState(false)
 
   // Chess state
-  const [started, setStarted]         = useState(false)
-  const [whiteTime, setWhiteTime]     = useState(0)
-  const [blackTime, setBlackTime]     = useState(0)
+  const [started, setStarted] = useState(false)
+  const [whiteTime, setWhiteTime] = useState(0)
+  const [blackTime, setBlackTime] = useState(0)
   const [isWhiteTurn, setIsWhiteTurn] = useState(true)
-  const [moves, setMoves]             = useState([])
-  const [inCheck, setInCheck]         = useState(false)
+  const [moves, setMoves] = useState([])
+  const [inCheck, setInCheck] = useState(false)
 
   // Chess clock
   useEffect(() => {
@@ -46,10 +46,10 @@ export default function App() {
       const geoUrl =
         `https://geocoding-api.open-meteo.com/v1/search?` +
         `name=${encodeURIComponent(cityName)}&count=5&country=US`
-      logs.push(`🔍 ${geoUrl}`)
-      const geoRes  = await fetch(geoUrl)
+      logs.push(`${geoUrl}`)
+      const geoRes = await fetch(geoUrl)
       const geoJson = await geoRes.json()
-      logs.push(`🔍 ${JSON.stringify(geoJson)}`)
+      logs.push(`${JSON.stringify(geoJson)}`)
       const loc = (geoJson.results || []).find(
         r => r.country_code === 'US' && r.admin1 === stateName
       )
@@ -58,16 +58,16 @@ export default function App() {
       // 3) Fetch forecast
       const url = new URL('https://api.open-meteo.com/v1/forecast')
       url.search = new URLSearchParams({
-        latitude:        loc.latitude,
-        longitude:       loc.longitude,
+        latitude: loc.latitude,
+        longitude: loc.longitude,
         current_weather: 'true',
-        daily:           'temperature_2m_max,temperature_2m_min',
-        timezone:        'auto'
+        daily: 'temperature_2m_max,temperature_2m_min',
+        timezone: 'auto'
       }).toString()
-      logs.push(`☁️ ${url}`)
-      const res  = await fetch(url)
+      logs.push(`${url}`)
+      const res = await fetch(url)
       const data = await res.json()
-      logs.push(`☁️ ${JSON.stringify(data)}`)
+      logs.push(`${JSON.stringify(data)}`)
       if (!res.ok) throw new Error('Weather data unavailable')
 
       const {
@@ -77,10 +77,10 @@ export default function App() {
 
       // 4) Save to state (including name, state, country, logs, etc)
       setWeatherData({
-        id:          Date.now(),
-        name:        loc.name,
-        state:       loc.admin1,
-        country:     loc.country,
+        id: Date.now(),
+        name: loc.name,
+        state: loc.admin1,
+        country: loc.country,
         temperature,
         windspeed,
         daily,
@@ -131,10 +131,9 @@ export default function App() {
           <details className="info-card">
             <summary>About the Weather</summary>
             <p>
-              Enter any U.S. city to see the current temperature (°F), wind speed,
-              and a 5-day high/low forecast. Under the hood we geocode via Open-Meteo,
-              fetch several US results, pick the one matching your state, then log
-              each API step.
+              Enter any U.S. city to see the current temperature (°F), wind speed, 
+              and a 5-day high/low forecast. From the backend we geocode via 
+              Open-Meteo then fetch current + daily data and log each API step.
             </p>
           </details>
 
@@ -142,7 +141,7 @@ export default function App() {
             onSearch={fetchWeather}
             placeholder="Enter a U.S. city..."
           />
-          {loading      && <p className="status">Loading…</p>}
+          {loading && <p className="status">Loading…</p>}
           {weatherError && <p className="error">{weatherError}</p>}
           <div className="cards-container">
             {weatherData && (
@@ -160,9 +159,9 @@ export default function App() {
           <details className="info-card">
             <summary>About the Chess Game</summary>
             <p>
-              A React-based chessboard utilizing <code>react-chessboard</code> and
-              <code>chess.js</code>. Each side has its own timer, moves are validated,
-              and you can review move history in the companion table.
+             A React-based chessboard utilizing react-chessboard and chess.js. 
+             Each side has its own timer, moves are validated, 
+             and you can review move history in the companion table.
             </p>
           </details>
 
@@ -207,8 +206,8 @@ export default function App() {
                   <thead>
                     <tr>
                       <th>Turn</th>
-                      <th>W</th>
-                      <th>B</th>
+                      <th>White</th>
+                      <th>Black</th>
                     </tr>
                   </thead>
                   <tbody>
