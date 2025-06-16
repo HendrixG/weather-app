@@ -563,14 +563,13 @@ h1 {
     Responsive Chess View Tweaks
   ────────────────────────────────────*/
   /* 1) Chessboard scales to full width */
-  .chess-area,
-  .react-chessboard {
-    width: 100% !important;      
-    max-width: 100% !important;  
-    aspect-ratio: 1 / 1;        
-    height: auto !important;     
-    touch-action: none;          
-    overscroll-behavior: contain; 
+  .chess-area [data-boardid] {
+    width: 100%   !important;
+    max-width: 100% !important;
+    aspect-ratio: 1 / 1;
+    height: auto  !important;
+    touch-action: none;
+    overscroll-behavior: contain;
   }
 
   /* 2) Move-history becomes full–width & scrollable */
