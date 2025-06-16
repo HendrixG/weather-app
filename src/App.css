@@ -559,15 +559,42 @@ h1 {
     min-height: 32px;
     padding: var(--space-xs);
   }
-}
+    /*────────────────────────────────────
+    Responsive Chess View Tweaks
+  ────────────────────────────────────*/
+  /* 1) Chessboard scales to full width */
+  .chess-area,
+  .react-chessboard {
+    width: 100% !important;      
+    max-width: 100% !important;  
+    aspect-ratio: 1 / 1;        
+    height: auto !important;     
+    touch-action: none;          
+    overscroll-behavior: contain; 
+  }
 
-/*────────────────────────────────────
-   Make the chessboard draggable on touch
-────────────────────────────────────*/
-.chess-area,
-.react-chessboard {
-  /* tell the browser: don’t steal my touch drags to scroll the page */
-  touch-action: none;
-  /* contain any overscroll so it never “bounces” the container */
-  overscroll-behavior: contain;
+  /* 2) Move-history becomes full–width & scrollable */
+  .move-history {
+    width: 100%;
+    margin: var(--space-sm) 0 var(--space-lg);
+    padding: var(--space-sm);
+  }
+  .move-history table {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    /* tiny shadow so user sees it scrolls horizontally */
+    box-shadow: inset 0 -2px 4px rgba(0,0,0,0.2);
+  }
+  .move-history th,
+  .move-history td {
+    padding: var(--space-xs) var(--space-sm);
+    font-size: 0.875rem;
+  }
+
+  /* 3) Reduce title size a bit to avoid crowding */
+  .chess-layout h1,
+  .move-history h2 {
+    font-size: 1.5rem;
+  }
 }
