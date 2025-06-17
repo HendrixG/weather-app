@@ -1,3 +1,4 @@
+// src/SearchBar.jsx
 import React, { useState, useEffect, useRef } from 'react'
 
 export default function SearchBar({ onSearch, placeholder }) {
@@ -10,11 +11,12 @@ export default function SearchBar({ onSearch, placeholder }) {
   useEffect(() => {
     if (!query) {
       setSuggestions([])
+      setShowSuggestions(false)
       return
     }
     clearTimeout(debounceRef.current)
     debounceRef.current = setTimeout(() => {
-      if (abortCtrlRef.current) abortCtrlRef.current.abort()
+      abortCtrlRef.current?.abort()
       const ctrl = new AbortController()
       abortCtrlRef.current = ctrl
 
@@ -26,13 +28,11 @@ export default function SearchBar({ onSearch, placeholder }) {
         .then(res => res.json())
         .then(json => {
           const rawResults = json.results || []
-          // only U.S. cities, no state-level entries
           const filtered = rawResults.filter(r =>
             r.country_code === 'US' && r.feature_code !== 'ADM1'
           )
           const mapped = filtered.map(r => ({
             display: `${r.name}, ${r.admin1}`,
-            // **only** city + state here
             raw:     `${r.name}, ${r.admin1}`
           }))
           setSuggestions(mapped)
@@ -46,14 +46,14 @@ export default function SearchBar({ onSearch, placeholder }) {
 
     return () => {
       clearTimeout(debounceRef.current)
-      if (abortCtrlRef.current) abortCtrlRef.current.abort()
+      abortCtrlRef.current?.abort()
     }
   }, [query])
 
   const doSearch = val => {
     setQuery(val)
     setShowSuggestions(false)
-    onSearch(val)           // now passes "Madison, Wisconsin"
+    onSearch(val)
   }
 
   const clearQuery = () => {
@@ -77,6 +77,7 @@ export default function SearchBar({ onSearch, placeholder }) {
             onFocus={() => query && setShowSuggestions(true)}
             onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
           />
+
           {query && (
             <button
               className="clear-button"
@@ -86,34 +87,36 @@ export default function SearchBar({ onSearch, placeholder }) {
               ×
             </button>
           )}
+
+          {showSuggestions && suggestions.length > 0 && (
+            <div className="suggestions-container">
+              <button
+                className="suggestions-close"
+                onMouseDown={() => setShowSuggestions(false)}
+                aria-label="Close suggestions"
+              >
+                ×
+              </button>
+              <ul className="suggestions">
+                {suggestions.map((loc, i) => (
+                  <li key={i} onMouseDown={() => doSearch(loc.raw)}>
+                    {loc.display}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
 
         <button
+          className="search-button"
           onClick={() => doSearch(query.trim())}
           disabled={!canSearch}
         >
           Search
         </button>
       </div>
-
-      {showSuggestions && suggestions.length > 0 && (
-        <div className="suggestions-container">
-          <button
-            className="suggestions-close"
-            onMouseDown={() => setShowSuggestions(false)}
-            aria-label="Close suggestions"
-          >
-            ×
-          </button>
-          <ul className="suggestions">
-            {suggestions.map((loc,i) => (
-              <li key={i} onMouseDown={() => doSearch(loc.raw)}>
-                {loc.display}
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
     </div>
   )
 }
+

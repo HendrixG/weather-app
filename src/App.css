@@ -30,29 +30,46 @@
 /*────────────────────────────────────
   Global & Base Layout
 ────────────────────────────────────*/
-* { box-sizing: border-box; }
-html, body { height: 100%; margin: 0; }
+html, body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  background: var(--bg);
+}
+
 body {
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  background: var(--bg);
   color: var(--text);
   font-family: var(--font);
   line-height: 1.6;
 }
 
+/* remove default focus outlines & iOS tap highlight */
+input:focus,
+button:focus {
+  outline: none;
+}
+input,
+button {
+  -webkit-tap-highlight-color: transparent;
+}
+
 /*────────────────────────────────────
-  Fixed Nav
+  Fixed Nav (desktop)
 ────────────────────────────────────*/
 .tabs {
   position: fixed;
   top: 24px;
-  left: 50%;
-  transform: translateX(-50%);
+  left: var(--space);
+  right: var(--space);
+  max-width: calc(768px - 2 * var(--space));
+  margin: 0 auto;
   height: var(--nav-height);
   display: flex;
   align-items: center;
+  justify-content: center;
   background: var(--bg-card);
   border-radius: var(--radius);
   gap: var(--space-sm);
@@ -69,11 +86,27 @@ body {
   cursor: pointer;
   transition: background-color 0.2s, color 0.2s, box-shadow 0.2s;
 }
-.tab:hover { background: var(--bg-muted); color: var(--text); }
+.tab:hover {
+  background: var(--bg-muted);
+  color: var(--text);
+}
 .tab.active {
   background: var(--accent);
   color: #fff;
   box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+/*────────────────────────────────────
+  Fixed Nav (mobile)
+────────────────────────────────────*/
+@media (max-width: 600px) {
+  .tabs {
+    left: var(--space-sm);
+    right: var(--space-sm);
+    max-width: calc(100% - 2 * var(--space-sm));
+    padding: 6px var(--space-sm);
+    gap: var(--space-xs);
+  }
 }
 
 /*────────────────────────────────────
@@ -111,7 +144,9 @@ body {
   position: absolute;
   right: var(--space);
 }
-.info-card[open] summary::after { content: '▾'; }
+.info-card[open] summary::after {
+  content: '▾';
+}
 .info-card p {
   padding: 0 var(--space) var(--space);
   margin: 0;
@@ -169,8 +204,16 @@ h1 {
   cursor: pointer;
   transition: color 0.2s;
 }
-.clear-button:hover { color: var(--accent); }
+.clear-button:hover {
+  color: var(--accent);
+}
+
+/*────────────────────────────────────
+  Search Button
+────────────────────────────────────*/
 .search-button {
+  position: relative;
+  z-index: 2;
   padding: 0 1.5rem;
   border: none;
   border-radius: var(--radius);
@@ -180,8 +223,13 @@ h1 {
   cursor: pointer;
   transition: background-color 0.2s;
 }
-.search-button:disabled { background: rgba(96,165,250,0.5); cursor: not-allowed; }
-.search-button:hover:not(:disabled) { background: var(--accent-hover); }
+.search-button:disabled {
+  background: rgba(96,165,250,0.5);
+  cursor: not-allowed;
+}
+.search-button:hover:not(:disabled) {
+  background: var(--accent-hover);
+}
 
 /*────────────────────────────────────
   Suggestions Dropdown
@@ -189,13 +237,13 @@ h1 {
 .suggestions-container {
   position: absolute;
   top: calc(100% + var(--space-xs));
-  left: 0; right: 0;
+  left: 0;
+  width: 100%;
   background: var(--bg-card);
   border: 1px solid var(--bg-muted);
   border-radius: var(--radius);
   box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-  overflow: hidden;
-  z-index: 1000;
+  z-index: 1;
 }
 .suggestions-close {
   position: absolute;
@@ -209,7 +257,9 @@ h1 {
   padding: 0;
   line-height: 1;
 }
-.suggestions-close:hover { color: var(--accent); }
+.suggestions-close:hover {
+  color: var(--accent);
+}
 .suggestions {
   list-style: none;
   margin: 0;
@@ -223,8 +273,13 @@ h1 {
   cursor: pointer;
   transition: background-color 0.2s, color 0.2s;
 }
-.suggestions li:last-child { border-bottom: none; }
-.suggestions li:hover { background: var(--bg-muted); color: var(--accent); }
+.suggestions li:last-child {
+  border-bottom: none;
+}
+.suggestions li:hover {
+  background: var(--bg-muted);
+  color: var(--accent);
+}
 
 /*────────────────────────────────────
   Weather Card Container
@@ -246,9 +301,15 @@ h1 {
   position: relative;
   transition: transform 0.2s;
 }
-.weather-card:hover { transform: translateY(-4px); }
-.weather-card h2 { margin-bottom: var(--space-md); }
-.weather-card p { margin: var(--space-xs) 0; }
+.weather-card:hover {
+  transform: translateY(-4px);
+}
+.weather-card h2 {
+  margin-bottom: var(--space-md);
+}
+.weather-card p {
+  margin: var(--space-xs) 0;
+}
 .remove-btn {
   position: absolute;
   top: var(--space-sm);
@@ -260,7 +321,9 @@ h1 {
   cursor: pointer;
   transition: color 0.2s;
 }
-.remove-btn:hover { color: var(--accent); }
+.remove-btn:hover {
+  color: var(--accent);
+}
 
 /*────────────────────────────────────
   Forecast Strip (F)
@@ -305,7 +368,9 @@ h1 {
   cursor: pointer;
   font-weight: 600;
 }
-.api-logs summary:hover { background: var(--bg-card); }
+.api-logs summary:hover {
+  background: var(--bg-card);
+}
 .api-logs[open] summary {
   border: 1px solid var(--accent);
   color: var(--accent);
@@ -323,7 +388,7 @@ h1 {
 }
 
 /*────────────────────────────────────
-  Chess Layout
+  Chess Layout & Board Sizing
 ────────────────────────────────────*/
 .chess-layout {
   display: flex;
@@ -339,16 +404,18 @@ h1 {
     align-items: flex-start;
   }
 }
-
-/*────────────────────────────────────
-  Chessboard Sizing
-────────────────────────────────────*/
-/* wrapper for the chessboard — fluid from 240px up to 600px */
+/* fluid board from 240px up to 600px */
 .chess-area {
   width: clamp(240px, 80vw, 600px);
   margin: 0 auto var(--space-lg);
   touch-action: none;
   overscroll-behavior: contain;
+}
+/* force react-chessboard to fill the wrapper */
+.react-chessboard__board {
+  width: 100% !important;
+  aspect-ratio: 1 / 1;
+  height: auto !important;
 }
 
 /*────────────────────────────────────
@@ -378,7 +445,9 @@ h1 {
   transition: background-color 0.2s;
   margin-bottom: var(--space-md);
 }
-.btn:hover { background: var(--accent-hover); }
+.btn:hover {
+  background: var(--accent-hover);
+}
 .btn-outline {
   background: var(--bg-card);
   color: var(--accent);
@@ -401,7 +470,8 @@ h1 {
   width: 100%;
   border-collapse: collapse;
 }
-.move-history th, .move-history td {
+.move-history th,
+.move-history td {
   padding: var(--space-sm);
   border-bottom: 1px solid var(--bg-muted);
 }
@@ -430,13 +500,7 @@ h1 {
     padding-bottom: var(--space-lg);
     text-align: center;
   }
-  .tabs {
-    width: calc(100% - 2 * var(--space-sm));
-    left: 50%;
-    transform: translateX(-50%);
-    padding: 6px var(--space-sm);
-    gap: var(--space-xs);
-  }
+  /* tabs already handled above */
   h1 {
     font-size: 1.75rem;
     margin-bottom: var(--space-md);
@@ -499,11 +563,14 @@ h1 {
     overflow-x: auto;
     box-shadow: inset 0 -2px 4px rgba(0,0,0,0.2);
   }
-  .move-history th, .move-history td {
+  .move-history th,
+  .move-history td {
     padding: var(--space-xs) var(--space-sm);
     font-size: 0.875rem;
   }
-  .chess-layout h1, .move-history h2 {
+  .chess-layout h1,
+  .move-history h2 {
     font-size: 1.5rem;
   }
 }
+
