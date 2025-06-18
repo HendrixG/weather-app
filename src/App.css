@@ -406,7 +406,7 @@ h1 {
 }
 /* fluid board from 240px up to 600px */
 .chess-area {
-  width: clamp(240px, 80vw, 600px);
+  width: clamp(200px, 60vw, 500px);
   margin: 0 auto var(--space-lg);
   touch-action: none;
   overscroll-behavior: contain;

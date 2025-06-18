@@ -129,10 +129,10 @@ export default function App() {
           <h1>Weather</h1>
 
           <details className="info-card">
-            <summary>About the Weather</summary>
+            <summary>About Weather</summary>
             <p>
               Enter any U.S. city to see the current temperature (°F), wind speed, 
-              and a 5-day high/low forecast. From the backend we geocode via 
+              and a 7-day high/low forecast. From the backend we geocode via 
               Open-Meteo then fetch current + daily data and log each API step.
             </p>
           </details>
@@ -154,10 +154,10 @@ export default function App() {
         </>
       ) : (
         <>
-          <h1>Chess Game</h1>
+          <h1>Chess</h1>
 
           <details className="info-card">
-            <summary>About the Chess Game</summary>
+            <summary>About Chess</summary>
             <p>
              A React-based chessboard utilizing react-chessboard and chess.js. 
              Each side has its own timer, moves are validated, 
