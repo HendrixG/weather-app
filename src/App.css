@@ -1,7 +1,13 @@
 /*────────────────────────────────────
   Variables & Font
 ────────────────────────────────────*/
+/* ── IMPORT MUST BE FIRST ── */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+/* ── GLOBAL BOX-SIZING ── */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
 
 :root {
   --font:            'Poppins', sans-serif;
@@ -54,23 +60,29 @@ button {
 }
 
 /*────────────────────────────────────
-  Fixed Nav (desktop)
+  Fixed Nav (desktop & mobile)
 ────────────────────────────────────*/
 .tabs {
   position: fixed;
   top: 24px;
+
+  /* span the same 768px “column,” centered in the viewport */
   left: var(--space);
   right: var(--space);
-  max-width: calc(768px - 2 * var(--space));
+  max-width: 768px;
   margin: 0 auto;
+
   height: var(--nav-height);
   display: flex;
   align-items: center;
   justify-content: center;
+
   background: var(--bg-card);
   border-radius: var(--radius);
   gap: var(--space-sm);
-  padding: 0 var(--space-sm);
+
+  /* match the container’s horizontal padding */
+  padding: 0 var(--space);
   z-index: 1000;
 }
 .tab {
@@ -93,15 +105,12 @@ button {
   box-shadow: 0 2px 8px rgba(0,0,0,0.2);
 }
 
-/*────────────────────────────────────
-  Fixed Nav (mobile)
-────────────────────────────────────*/
 @media (max-width: 600px) {
   .tabs {
     left: var(--space-sm);
     right: var(--space-sm);
     max-width: calc(100% - 2 * var(--space-sm));
-    padding: 6px var(--space-sm);
+    padding: 0 var(--space-sm);
     gap: var(--space-xs);
   }
 }
@@ -111,8 +120,14 @@ button {
 ────────────────────────────────────*/
 .app-container {
   margin-top: calc(24px + var(--nav-height) + var(--info-gap));
+
+  /* same 768px column + gutter */
   max-width: 768px;
   width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+
+  /* identical horizontal padding */
   padding: var(--space) var(--space);
   text-align: center;
 }
@@ -385,7 +400,7 @@ h1 {
 }
 
 /*────────────────────────────────────
-  Chess Layout & Board Sizing (grid)
+  Chess Layout & Board Sizing
 ────────────────────────────────────*/
 .chess-layout {
   display: grid;
@@ -393,27 +408,24 @@ h1 {
   gap: var(--space-lg);
   align-items: start;
 }
-
-/* ensure each half fills its column */
 .chess-area,
 .move-history {
-  width: 100%;
   margin: 0;
+  display: block; /* ensure it shows when enabled */
 }
-
-/* force react-chessboard to fill its wrapper */
 .chess-area .react-chessboard__board {
   width: 100% !important;
   aspect-ratio: 1 / 1;
   height: auto !important;
+  display: block;
 }
 
 /*────────────────────────────────────
   Chess Buttons & History
 ────────────────────────────────────*/
+/* hide the board entirely until “Start Game” */
 .chess-area.disabled {
-  opacity: 0.5;
-  pointer-events: none;
+  display: none;
 }
 .check-alert {
   color: #e11d48;
@@ -448,7 +460,7 @@ h1 {
   padding: var(--space-lg);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
-  max-width: none;
+  width: 100%;
 }
 .move-history .timers {
   display: flex;
@@ -484,10 +496,8 @@ h1 {
 ────────────────────────────────────*/
 @media (max-width: 600px) {
   .app-container {
-    margin-top: calc(24px + var(--nav-height) + var(--info-gap));
     padding: var(--space-sm);
     padding-bottom: var(--space-lg);
-    text-align: center;
   }
   h1 {
     font-size: 1.75rem;
@@ -506,8 +516,6 @@ h1 {
   }
   .suggestions-container {
     width: 100%;
-    left: 0;
-    right: 0;
     top: calc(100% + var(--space-xs));
   }
   .cards-container {
@@ -531,51 +539,44 @@ h1 {
     padding: var(--space-xs) var(--space-sm);
   }
   .chess-layout {
-    display: block; /* stack vertically on narrow screens */
+    display: block;
   }
   .chess-area,
   .move-history {
-    width: 100%;
     margin-bottom: var(--space-lg);
   }
 }
 
 /*────────────────────────────────────
-  About Page Spacing Tidy
+  About / Contact panel
 ────────────────────────────────────*/
 .about-page {
-  max-width: 600px;
-  margin: var(--space-lg) auto;      
+  max-width: 768px;
+  margin: var(--space-sm) auto var(--space-lg);
   background: var(--bg-card);
   padding: var(--space-lg);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
-  text-align: center;                
+  text-align: center;
   display: flex;
   flex-direction: column;
-  gap: var(--space-sm);             
+  gap: var(--space-sm);
 }
-
 .about-page h1 {
   margin: 0;
-  margin-bottom: var(--space-sx);
+  margin-bottom: var(--space-xs);
   font-size: 2rem;
 }
-
 .about-page p {
   margin: 0;
-  margin-bottom: var(--space-sm);
   line-height: 1.4;
 }
-
-/* make each link sit on its own “row” */
 .about-page a {
   display: block;
   margin: var(--space-xs) 0;
   color: var(--accent);
   text-decoration: none;
 }
-
 .about-page a:hover {
   color: var(--accent-hover);
   text-decoration: underline;

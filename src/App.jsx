@@ -41,7 +41,7 @@ export default function App() {
       const logs = []
       const [cityName, stateName] = cityRaw.split(',').map(s => s.trim())
 
-      // Geocode
+      // 1) Geocode
       const geoUrl =
         `https://geocoding-api.open-meteo.com/v1/search?` +
         `name=${encodeURIComponent(cityName)}&count=5&country=US`
@@ -54,7 +54,7 @@ export default function App() {
       )
       if (!loc) throw new Error('Location not found')
 
-      // Forecast
+      // 2) Forecast
       const url = new URL('https://api.open-meteo.com/v1/forecast')
       url.search = new URLSearchParams({
         latitude:        loc.latitude,
@@ -179,24 +179,23 @@ export default function App() {
             </button>
           )}
 
-          <div className="chess-layout">
-            <div className={started ? 'chess-area' : 'chess-area disabled'}>
-              {inCheck && (
-                <div className="check-alert">
-                  ♟ The King is in Check!
-                </div>
-              )}
-              <ChessGame
-                moves={moves}
-                onMoveUpdate={(m, c) => {
-                  setMoves(m)
-                  setInCheck(c)
-                }}
-                onTurnChange={setIsWhiteTurn}
-              />
-            </div>
-
-            {started && (
+          {started && (
+            <div className="chess-layout">
+              <div className="chess-area">
+                {inCheck && (
+                  <div className="check-alert">
+                    ♟ The King is in Check!
+                  </div>
+                )}
+                <ChessGame
+                  moves={moves}
+                  onMoveUpdate={(m, c) => {
+                    setMoves(m)
+                    setInCheck(c)
+                  }}
+                  onTurnChange={setIsWhiteTurn}
+                />
+              </div>
               <div className="move-history">
                 <div className="timers">
                   <span>♟ {whiteTime}s</span>
@@ -223,13 +222,14 @@ export default function App() {
                   </tbody>
                 </table>
               </div>
-            )}
-          </div>
+            </div>
+          )}
         </>
       )}
 
-      {/* ABOUT VIEW */}
+      {/* CONTACT VIEW */}
       {tab === 'contact' && <About />}
     </div>
   )
 }
+
