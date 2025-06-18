@@ -1,5 +1,3 @@
-/* src/App.css */
-
 /*────────────────────────────────────
   Variables & Font
 ────────────────────────────────────*/
@@ -36,7 +34,6 @@ html, body {
   min-height: 100vh;
   background: var(--bg);
 }
-
 body {
   display: flex;
   justify-content: center;
@@ -388,31 +385,24 @@ h1 {
 }
 
 /*────────────────────────────────────
-  Chess Layout & Board Sizing
+  Chess Layout & Board Sizing (grid)
 ────────────────────────────────────*/
 .chess-layout {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: var(--space-lg);
-  margin-top: var(--space-lg);
+  align-items: start;
 }
-@media (min-width: 768px) {
-  .chess-layout {
-    flex-direction: row;
-    justify-content: center;
-    align-items: flex-start;
-  }
+
+/* ensure each half fills its column */
+.chess-area,
+.move-history {
+  width: 100%;
+  margin: 0;
 }
-/* fluid board from 240px up to 600px */
-.chess-area {
-  width: clamp(200px, 60vw, 500px);
-  margin: 0 auto var(--space-lg);
-  touch-action: none;
-  overscroll-behavior: contain;
-}
-/* force react-chessboard to fill the wrapper */
-.react-chessboard__board {
+
+/* force react-chessboard to fill its wrapper */
+.chess-area .react-chessboard__board {
   width: 100% !important;
   aspect-ratio: 1 / 1;
   height: auto !important;
@@ -458,8 +448,7 @@ h1 {
   padding: var(--space-lg);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
-  max-width: 600px;
-  margin: 0 auto var(--space-lg);
+  max-width: none;
 }
 .move-history .timers {
   display: flex;
@@ -491,7 +480,7 @@ h1 {
 }
 
 /*────────────────────────────────────
-  MOBILE LAYOUT (max-width: 600px)
+  Mobile adjustments
 ────────────────────────────────────*/
 @media (max-width: 600px) {
   .app-container {
@@ -500,7 +489,6 @@ h1 {
     padding-bottom: var(--space-lg);
     text-align: center;
   }
-  /* tabs already handled above */
   h1 {
     font-size: 1.75rem;
     margin-bottom: var(--space-md);
@@ -543,34 +531,52 @@ h1 {
     padding: var(--space-xs) var(--space-sm);
   }
   .chess-layout {
-    flex-direction: column;
-    gap: var(--space-sm);
-    margin-top: var(--space-lg);
-    padding: 0;
+    display: block; /* stack vertically on narrow screens */
   }
-  .chess-area {
-    width: 100%;
-    padding: 0 var(--space-sm);
-  }
+  .chess-area,
   .move-history {
     width: 100%;
-    margin: var(--space-sm) 0 var(--space-lg);
-    padding: var(--space-sm);
-  }
-  .move-history table {
-    display: block;
-    width: 100%;
-    overflow-x: auto;
-    box-shadow: inset 0 -2px 4px rgba(0,0,0,0.2);
-  }
-  .move-history th,
-  .move-history td {
-    padding: var(--space-xs) var(--space-sm);
-    font-size: 0.875rem;
-  }
-  .chess-layout h1,
-  .move-history h2 {
-    font-size: 1.5rem;
+    margin-bottom: var(--space-lg);
   }
 }
 
+/*────────────────────────────────────
+  About Page Spacing Tidy
+────────────────────────────────────*/
+.about-page {
+  max-width: 600px;
+  margin: var(--space-lg) auto;      
+  background: var(--bg-card);
+  padding: var(--space-lg);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  text-align: center;                
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);             
+}
+
+.about-page h1 {
+  margin: 0;
+  margin-bottom: var(--space-sx);
+  font-size: 2rem;
+}
+
+.about-page p {
+  margin: 0;
+  margin-bottom: var(--space-sm);
+  line-height: 1.4;
+}
+
+/* make each link sit on its own “row” */
+.about-page a {
+  display: block;
+  margin: var(--space-xs) 0;
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.about-page a:hover {
+  color: var(--accent-hover);
+  text-decoration: underline;
+}
